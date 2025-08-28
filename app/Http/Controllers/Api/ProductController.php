@@ -26,15 +26,15 @@ class ProductController extends Controller
     {
         try {
             $params = $request->validate([
-                'name' => 'required|alpha|max:255',
-                'value' => 'required|numeric',
+                'name' => 'required|string|max:255',
+                'price' => 'required|numeric',
                 'amount' => 'required|integer',
             ]);
 
             $product = (new Product(new ProductRepository()))
                 ->setId(Product::generateUuid())
                 ->setName($params['name'])
-                ->setPrice($params['value'])
+                ->setPrice($params['price'])
                 ->setAmount($params['amount'])
             ;
 
@@ -43,7 +43,7 @@ class ProductController extends Controller
             $response = [
                 'id' => $product->getId(),
                 'name' => $product->getName(),
-                'value' => $product->getPrice(),
+                'price' => $product->getPrice(),
                 'amount' => $product->getAmount(),
             ];
 
@@ -53,7 +53,6 @@ class ProductController extends Controller
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
 
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
