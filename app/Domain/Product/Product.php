@@ -54,6 +54,10 @@ class Product
 
     public function setPrice(float $price): Product
     {
+        if ($price <= 0) {
+            throw new \InvalidArgumentException('Price must be greater than zero');
+        }
+
         $this->price = $price;
 
         return $this;
