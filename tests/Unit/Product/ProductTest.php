@@ -34,6 +34,7 @@ class ProductTest extends TestCase
 
         $product->setId('invalid-uuid');
     }
+
     public function test_should_throw_exception_when_product_price_is_invalid()
     {
         $product = new Product();
