@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Domain\Product\Product;
+use App\DTO\ProductData;
 use App\Http\Controllers\Controller;
-use App\Repositories\ProductRepository;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
@@ -33,41 +31,37 @@ class ProductController extends Controller
                 'amount' => 'required|integer',
             ]);
 
-            $product = (new Product(new ProductRepository()))
-                ->setId(Product::generateUuid())
-                ->setName($params['name'])
-                ->setPrice($params['price'])
-                ->setAmount($params['amount'])
-            ;
+            $productData = new ProductData(
+                ProductData::generateUuid(),
+                $params['name'],
+                $params['price'],
+                $params['amount']
+            );
 
-            $product->saveProduct();
+            $product = $this->service->create($productData);
 
-            $response = [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-                'amount' => $product->getAmount(),
-            ];
-
-            return response()->json($response, 201,);
+            return response()->json($product->only(['id', 'name', 'price', 'amount']), 201);
         } catch (ValidationException $e) {
-            Log::error('Erro ao salvar produto: {message}', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Erro ao salvar produto: {message}', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    public function show(string $id)
+    public function show()
+    {
+       try {
+            $products = $this->service->findAll();
+
+            return response()->json($products->toArray(), 200);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
+
+    public function showOne(string $id)
     {
         try {
             $product = $this->service->findById($id);

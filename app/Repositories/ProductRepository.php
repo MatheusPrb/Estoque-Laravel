@@ -2,30 +2,30 @@
 
 namespace App\Repositories;
 
-use App\Domain\Product\Product;
 use App\Models\ProductModel;
-use App\Domain\Product\ProductPersistenceInterface;
-use Illuminate\Support\Facades\Log;
+use App\DTO\ProductData;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductRepository implements ProductPersistenceInterface
 {
-    public function save(Product $product): void
+    public function create(ProductData $data): ProductModel
     {
-        try {
-            ProductModel::create([
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-                'amount' => $product->getAmount(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Erro ao salvar produto: {message}', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+        return ProductModel::create([
+            'id' => $data->id,
+            'name' => $data->name,
+            'price' => $data->price,
+            'amount' => $data->amount,
+        ]);
+    }
 
-            throw new \RuntimeException($e->getMessage(), 500, $e);
-        }
+    public function validateName(ProductData $data): bool
+    {
+        return ProductModel::where('name', $data->name)->exists();
+    }
+
+    public function findAll(): Collection
+    {
+        return ProductModel::all();
     }
 
     public function findById(string $id): ProductModel

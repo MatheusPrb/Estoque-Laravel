@@ -2,6 +2,7 @@
 
 namespace App\Domain\Product;
 
+use App\Repositories\ProductPersistenceInterface;
 use App\Traits\Uuid;
 
 class Product
@@ -80,8 +81,8 @@ class Product
         return $this->amount;
     }
 
-    public function saveProduct(): void
-    {
-        $this->getPeristence()->save($this);
-    }
+    // public function saveProduct(): void
+    // {
+    //     $this->getPeristence()->save($this);
+    // }
 }

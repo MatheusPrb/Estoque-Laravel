@@ -8,10 +8,19 @@ use Illuminate\Support\Str;
 class ProductModel extends Model
 {
     protected $table = 'product';
-    
+
     public $timestamps = true;
 
     protected $fillable = ['id', 'name', 'price', 'amount'];
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
+    protected $casts = [
+        'price' => 'float',
+        'created_at' => 'date:Y-m-d',
+        'updated_at' => 'date:Y-m-d',
+    ];
 
     protected static function boot()
     {
