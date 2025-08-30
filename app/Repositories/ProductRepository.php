@@ -28,20 +28,8 @@ class ProductRepository implements ProductPersistenceInterface
         }
     }
 
-    public function loadById(Product $product): bool
+    public function findById(string $id): ProductModel
     {
-        $record = ProductModel::find($product->getId());
-
-        if (!$record) {
-            return false;   
-        }
-
-        $product
-            ->setName($record->name)
-            ->setPrice($record->price)
-            ->setAmount($record->amount)
-        ;
-
-        return true;
+        return ProductModel::find($id);
     }
 }

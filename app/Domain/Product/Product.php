@@ -84,9 +84,4 @@ class Product
     {
         $this->getPeristence()->save($this);
     }
-
-    public function loadById(): bool
-    {
-        return $this->getPeristence()->loadById($this);
-    }
 }
