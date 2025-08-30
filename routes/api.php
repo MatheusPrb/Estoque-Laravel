@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Route;
 Route::post('/users', [UserController::class, 'store']);
 
 // Rota de cadastro de produto
-Route::post('/products', [ProductController::class, 'store']);
+Route::post('/register/products', [ProductController::class, 'register']);
 
 // Rota de listagem de todos os produtos
-Route::get('/products', [ProductController::class, 'show']);
+Route::get('/products', [ProductController::class, 'findAll']);
 
 // Rota de listagem de um produto
-Route::get('/products/{id}', [ProductController::class, 'showOne']);
+Route::get('/{id}/products', [ProductController::class, 'findOne']);
 

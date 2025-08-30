@@ -22,7 +22,7 @@ class ProductController extends Controller
         //
     }
 
-    public function store(Request $request)
+    public function register(Request $request)
     {
         try {
             $params = $request->validate([
@@ -48,7 +48,7 @@ class ProductController extends Controller
         }
     }
 
-    public function show()
+    public function findAll()
     {
        try {
             $products = $this->service->findAll();
@@ -61,7 +61,7 @@ class ProductController extends Controller
         }
     }
 
-    public function showOne(string $id)
+    public function findOne(string $id)
     {
         try {
             $product = $this->service->findById($id);
