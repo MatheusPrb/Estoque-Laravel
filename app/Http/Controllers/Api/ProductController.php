@@ -17,11 +17,6 @@ class ProductController extends Controller
         $this->service  = $service ;
     }
 
-    public function index()
-    {
-        //
-    }
-
     public function register(Request $request)
     {
         try {
