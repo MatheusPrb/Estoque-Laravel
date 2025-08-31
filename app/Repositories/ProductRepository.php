@@ -2,46 +2,40 @@
 
 namespace App\Repositories;
 
-use App\Domain\Product\Product;
 use App\Models\ProductModel;
-use App\Domain\Product\ProductPersistenceInterface;
-use Illuminate\Support\Facades\Log;
+use App\DTO\ProductData;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository implements ProductPersistenceInterface
 {
-    public function save(Product $product): void
+    public function create(ProductData $data): ProductModel
     {
-        try {
-            ProductModel::create([
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-                'amount' => $product->getAmount(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Erro ao salvar produto: {message}', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            throw new \RuntimeException($e->getMessage(), 500, $e);
-        }
+        return ProductModel::create([
+            'id' => $data->id,
+            'name' => $data->name,
+            'price' => $data->price,
+            'amount' => $data->amount,
+        ]);
     }
 
-    public function loadById(Product $product): bool
+    public function validateName(ProductData $data): bool
     {
-        $record = ProductModel::find($product->getId());
+        return ProductModel::where('name', $data->name)->exists();
+    }
 
-        if (!$record) {
-            return false;   
-        }
+    public function findAll(): Collection
+    {
+        return ProductModel::all();
+    }
 
-        $product
-            ->setName($record->name)
-            ->setPrice($record->price)
-            ->setAmount($record->amount)
-        ;
+    public function findAllPaginated(int $perPage, int $page): LengthAwarePaginator
+    {
+        return ProductModel::paginate($perPage, ['*'], 'page', $page);
+    }
 
-        return true;
+    public function findById(string $id): ?ProductModel
+    {
+        return ProductModel::find($id);
     }
 }
