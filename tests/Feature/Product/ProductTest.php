@@ -9,6 +9,8 @@ class ProductTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const BASE_URL = '/api/register/products';
+
     public function createParams(): array
     {
         return  [
@@ -21,7 +23,7 @@ class ProductTest extends TestCase
     public function test_the_application_returns_a_successful_response(): void
     {
         $params = $this->createParams();
-        $response = $this->post('/api/products', $params);
+        $response = $this->post(self::BASE_URL, $params);
 
         $response
             ->assertStatus(201)
@@ -35,7 +37,7 @@ class ProductTest extends TestCase
 
     public function test_the_application_validates_required_fields(): void
     {
-        $response = $this->post('/api/products', []);
+        $response = $this->post(self::BASE_URL, []);
 
         $response
             ->assertStatus(422)
@@ -51,7 +53,7 @@ class ProductTest extends TestCase
             'amount' => 'invalid',
         ];
 
-        $response = $this->post('/api/products', $params);
+        $response = $this->post(self::BASE_URL, $params);
 
         $response
             ->assertStatus(422)

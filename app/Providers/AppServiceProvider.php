@@ -2,16 +2,18 @@
 
 namespace App\Providers;
 
+use App\Repositories\ProductPersistenceInterface;
+use App\Repositories\ProductRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+    public function register()
     {
-        //
+        $this->app->bind(
+            ProductPersistenceInterface::class,
+            ProductRepository::class
+        );
     }
 
     /**
