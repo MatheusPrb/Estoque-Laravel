@@ -43,10 +43,13 @@ class ProductController extends Controller
         }
     }
 
-    public function findAll()
+    public function findAll(Request $request)
     {
        try {
-            $products = $this->service->findAll();
+            $perPage = $request->query('per_page', 10);
+            $page    = $request->query('page', 1);
+
+            $products = $this->service->findAllPaginated($perPage, $page);
 
             return response()->json($products->toArray(), 200);
         } catch (\InvalidArgumentException $e) {

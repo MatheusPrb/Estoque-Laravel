@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\ProductModel;
 use App\DTO\ProductData;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository implements ProductPersistenceInterface
 {
@@ -26,6 +27,11 @@ class ProductRepository implements ProductPersistenceInterface
     public function findAll(): Collection
     {
         return ProductModel::all();
+    }
+
+    public function findAllPaginated(int $perPage, int $page): LengthAwarePaginator
+    {
+        return ProductModel::paginate($perPage, ['*'], 'page', $page);
     }
 
     public function findById(string $id): ProductModel

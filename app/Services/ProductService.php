@@ -7,6 +7,7 @@ use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
 use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
 {
@@ -36,6 +37,20 @@ class ProductService
     public function findAll(): Collection
     {
         $products = $this->repository->findAll();
+        if ($products->isEmpty()) {
+            throw new \InvalidArgumentException('Nenhum produto encontrado.');
+        }
+
+        return $products;
+    }
+
+    public function findAllPaginated(int $perPage = 10, int $page = 1): LengthAwarePaginator
+    {
+        if ($perPage <= 0 || $page <= 0) {
+            throw new \InvalidArgumentException('Parâmetros de paginação inválidos.');
+        }
+
+        $products = $this->repository->findAllPaginated($perPage, $page);
         if ($products->isEmpty()) {
             throw new \InvalidArgumentException('Nenhum produto encontrado.');
         }
