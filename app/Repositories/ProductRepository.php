@@ -34,7 +34,7 @@ class ProductRepository implements ProductPersistenceInterface
         return ProductModel::paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function findById(string $id): ProductModel
+    public function findById(string $id): ?ProductModel
     {
         return ProductModel::find($id);
     }

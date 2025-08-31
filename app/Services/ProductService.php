@@ -67,7 +67,7 @@ class ProductService
         $product = $this->repository->findById($id);
 
         if (!$product) {
-            throw new \Exception("Produto {$id} não encontrado.");
+            throw new \Exception("Produto '{$id}' não encontrado.");
         }
 
         return $product;

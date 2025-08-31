@@ -13,5 +13,5 @@ interface ProductPersistenceInterface
     public function validateName(ProductData $data): bool;
     public function findAll(): Collection;
     public function findAllPaginated(int $perPage, int $page): LengthAwarePaginator;
-    public function findById(string $id): ProductModel;
+    public function findById(string $id): ?ProductModel;
 }
