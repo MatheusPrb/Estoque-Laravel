@@ -55,7 +55,7 @@ class ProductService
 
         $products = $this->repository->findAllPaginated($perPage, $page);
         if ($products->isEmpty()) {
-            throw new \InvalidArgumentException('Nenhum produto encontrado.');
+            throw new \Exception('Nenhum produto encontrado.');
         }
 
         return $products;
@@ -63,7 +63,7 @@ class ProductService
 
     public function edit(ProductData $data): ProductModel
     {
-        $product = $this->repository->findById($data);
+        $product = $this->repository->findOne($data);
 
         if ($data->price !== null) {
             $product->price = $data->price;
@@ -84,9 +84,9 @@ class ProductService
         return $product;
     }
 
-    public function findById(ProductData $productData): ProductModel
+    public function findOne(ProductData $productData): ProductModel
     {
-        $product = $this->repository->findById($productData);
+        $product = $this->repository->findOne($productData);
         if (!$product) {
             throw new \Exception("Produto '{$productData->id}' não encontrado.");
         }

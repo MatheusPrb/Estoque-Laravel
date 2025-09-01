@@ -14,5 +14,5 @@ interface ProductPersistenceInterface
     public function findAll(): Collection;
     public function findAllPaginated(int $perPage, int $page): LengthAwarePaginator;
     public function update(ProductModel $product): ProductModel;
-    public function findById(ProductData $data): ?ProductModel;
+    public function findOne(ProductData $data): ?ProductModel;
 }

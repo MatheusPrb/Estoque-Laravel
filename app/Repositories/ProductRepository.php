@@ -40,8 +40,7 @@ class ProductRepository implements ProductPersistenceInterface
         return $product;
     }
 
-
-    public function findById(ProductData $data): ?ProductModel
+    public function findOne(ProductData $data): ?ProductModel
     {
         return ProductModel::find($data->id);
     }

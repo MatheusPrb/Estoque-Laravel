@@ -72,7 +72,7 @@ class ProductController extends Controller
         try {
             $productData = new ProductData($id);
 
-            $product = $this->service->findById($productData);
+            $product = $this->service->findOne($productData);
 
             return response()->json($product->only(['id', 'name', 'price', 'amount']), 200);
         } catch (\InvalidArgumentException $e) {

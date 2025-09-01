@@ -19,7 +19,7 @@ class ProductData
 
     private function validate(): void
     {
-        Uuid::checkUuid($this->id);
+        self::checkUuid($this->id);
     
         if ($this->name !== null && trim($this->name) === '') {
             throw new \InvalidArgumentException('Name cannot be empty');
