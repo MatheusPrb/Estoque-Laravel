@@ -34,12 +34,14 @@ jobs:
           echo "TOTAL_COVERAGE=$TOTAL_COVERAGE"
           echo "TOTAL_COVERAGE=$TOTAL_COVERAGE" >> $GITHUB_ENV
 
-      - name: Show files with coverage < 80%
+      - name: Show files with coverage < 80% in table
         run: |
           echo "Files with coverage below 80%:"
+          printf "%-6s | %s\n" "PERCENT" "FILE"
+          printf "------- | ----\n"
           awk '/^[[:space:]]*[0-9]+%/ {
                   split($1, a, "%"); 
-                  if (a[1] < 80) print $0 
+                  if (a[1] < 80) printf "%-6s | %s\n", $1, $2
                }' coverage.txt || true
 
       - name: Fail if coverage < 80%
