@@ -18,3 +18,6 @@ Route::get('/{id}/products', [ProductController::class, 'findOne']);
 
 // Rota de edição de um produto
 Route::patch('/edit/{id}/products', [ProductController::class, 'update']);
+
+// Rota de exclusão de um produto
+Route::delete('/delete/{id}/products', [ProductController::class, 'delete']);

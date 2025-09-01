@@ -44,4 +44,9 @@ class ProductRepository implements ProductPersistenceInterface
     {
         return ProductModel::find($data->id);
     }
+
+    public function delete(ProductModel $product): void
+    {
+        $product->delete();
+    }
 }

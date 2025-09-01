@@ -97,4 +97,14 @@ class ProductService
 
         return $product;
     }
+
+    public function delete(ProductData $productData): void
+    {
+        $product = $this->repository->findOne($productData);
+        if (!$product) {
+            throw new \Exception("Produto '{$productData->id}' não encontrado.");
+        }
+
+        $this->repository->delete($product);
+    }
 }

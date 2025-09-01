@@ -105,8 +105,18 @@ class ProductController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function delete(Request $request)
     {
-        //
+        try {
+            $productData = new ProductData($request->route('id'));
+
+            $this->service->delete($productData);
+
+            return response()->json(['message' => 'Product deleted successfully'], 200);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 }

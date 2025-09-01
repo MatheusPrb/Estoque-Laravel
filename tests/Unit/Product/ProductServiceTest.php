@@ -246,4 +246,16 @@ class ProductServiceTest extends TestCase
 
         $this->service->edit($data);
     }
+
+    // public function test_delete_should_throw_exception_if_product_not_found()
+    // {
+    //     $data = new ProductData(ProductData::generateUuid());
+
+    //     $this->repository->method('findOne')->with($data)->willReturn(null);
+
+    //     $this->expectException(\Exception::class);
+    //     $this->expectExceptionMessage("Produto '{$data->id}' não encontrado.");
+
+    //     $this->service->delete($data);
+    // }
 }
