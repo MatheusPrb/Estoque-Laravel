@@ -11,7 +11,13 @@ class ProductModel extends Model
 
     public $timestamps = true;
 
-    protected $fillable = ['id', 'name', 'price', 'amount'];
+    protected $fillable = [
+        'id',
+        'name',
+        'status',
+        'price',
+        'amount',
+    ];
 
     protected $keyType = 'string';
     public $incrementing = false;

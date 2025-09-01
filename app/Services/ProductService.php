@@ -79,6 +79,10 @@ class ProductService
             $product->name = $data->name;
         }
 
+        if ($data->status !== null) {
+            $product->status = $data->status;
+        }
+
         $this->repository->update($product);
 
         return $product;

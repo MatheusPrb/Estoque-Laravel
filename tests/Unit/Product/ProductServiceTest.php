@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
 use App\Services\ProductService;
@@ -24,7 +25,7 @@ class ProductServiceTest extends TestCase
 
     public function test_create_product_success()
     {
-        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', 100.0, 10);
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', ProductStatusEnum::ACTIVE->value, 100.0, 10);
 
         $this->repository->method('validateName')->willReturn(false);
         $this->repository->method('create')->willReturn(new ProductModel([
@@ -42,7 +43,7 @@ class ProductServiceTest extends TestCase
 
     public function test_create_should_throw_exception_if_name_already_exists()
     {
-        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', 100.0, 10);
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', ProductStatusEnum::ACTIVE->value, 100.0, 10);
 
         $this->repository->method('validateName')->willReturn(true);
 
@@ -146,6 +147,7 @@ class ProductServiceTest extends TestCase
         $data = new ProductData(
             ProductData::generateUuid(),
             null,
+            null,
             200.0,
             null
         );
@@ -176,7 +178,7 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_update_amount_only()
     {
-        $data = new ProductData(ProductData::generateUuid(), null, null, 99);
+        $data = new ProductData(ProductData::generateUuid(), null, null, null, 99);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto W', 'price' => 50.0, 'amount' => 10]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
@@ -191,7 +193,7 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_update_name_only()
     {
-        $data = new ProductData(ProductData::generateUuid(), 'Novo Nome', null, null);
+        $data = new ProductData(ProductData::generateUuid(), 'Novo Nome', null, null, null);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto V', 'price' => 70.0, 'amount' => 7]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
@@ -207,21 +209,21 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_throw_exception_if_name_already_exists()
     {
-        $data = new ProductData(ProductData::generateUuid(), 'Nome Existente', null, null);
+        $data = new ProductData(ProductData::generateUuid(), 'Nome Existente', null, null, null);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto T', 'price' => 80.0, 'amount' => 8]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
         $this->repository->method('validateName')->willReturn(true);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Produto 'Nome Existente' já cadastrado.");
+        $this->expectExceptionMessage("Produto '{$data->name}' já cadastrado.");
 
         $this->service->edit($data);
     }
 
     public function test_edit_should_update_multiple_fields()
     {
-        $data = new ProductData(ProductData::generateUuid(), 'Produto Atualizado', 300.0, 15);
+        $data = new ProductData(ProductData::generateUuid(), 'Produto Atualizado', null, 300.0, 15);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto S', 'price' => 100.0, 'amount' => 5]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
@@ -233,5 +235,23 @@ class ProductServiceTest extends TestCase
         $this->assertEquals('Produto Atualizado', $result->name);
         $this->assertEquals(300.0, $result->price);
         $this->assertEquals(15, $result->amount);
+    }
+
+    public function test_edit_should_update_status_only()
+    {
+        $data = new ProductData(ProductData::generateUuid(), 'Nome Qualquer', ProductStatusEnum::INACTIVE->value, null, null);
+        $product = new ProductModel(['id' => $data->id, 'name' => $data->name, 'price' => 150.0, 'amount' => 12, 'status' => ProductStatusEnum::ACTIVE->value]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+        $this->repository->method('update')->willReturn($product);
+
+        $result = $this->service->edit($data);
+
+        $this->assertEquals(ProductStatusEnum::INACTIVE->value, $result->status);
+        $this->assertEquals($product->name, $result->name);
+        $this->assertEquals(150.0, $result->price);
+        $this->assertEquals(12, $result->amount);
+
+        $this->service->edit($data);
     }
 }

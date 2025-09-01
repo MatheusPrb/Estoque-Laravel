@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Services\ProductService;
 use App\Traits\Uuid;
@@ -32,6 +33,7 @@ class ProductController extends Controller
             $productData = new ProductData(
                 ProductData::generateUuid(),
                 $params['name'],
+                ProductStatusEnum::ACTIVE->value,
                 $params['price'],
                 $params['amount']
             );
@@ -74,7 +76,7 @@ class ProductController extends Controller
 
             $product = $this->service->findOne($productData);
 
-            return response()->json($product->only(['id', 'name', 'price', 'amount']), 200);
+            return response()->json($product->only(['id', 'name','status', 'price', 'amount']), 200);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         } catch (\Exception $e) {
@@ -88,13 +90,14 @@ class ProductController extends Controller
             $data = new ProductData(
                 $request->route('id'),
                 $request->input('name'),
+                $request->input('status'),
                 $request->input('price'),
                 $request->input('amount')
             );
 
             $product = $this->service->edit($data);
 
-            return response()->json($product->only(['id', 'name', 'price', 'amount']), 200);
+            return response()->json($product->only(['id', 'name', 'status', 'price', 'amount']), 200);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         } catch (\Exception $e) {
