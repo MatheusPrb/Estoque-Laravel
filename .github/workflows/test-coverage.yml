@@ -24,20 +24,20 @@ jobs:
       - name: Run tests with coverage
         run: ./vendor/bin/phpunit --coverage-text --whitelist app/Services > coverage.txt || true
 
-      - name: Extract coverage percentage
+      - name: Extract total coverage
         run: |
           # Extrai o percentual total
           TOTAL_COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
           if [ -z "$TOTAL_COVERAGE" ]; then
             TOTAL_COVERAGE=0
           fi
+          echo "TOTAL_COVERAGE=$TOTAL_COVERAGE"
           echo "TOTAL_COVERAGE=$TOTAL_COVERAGE" >> $GITHUB_ENV
-          echo "Current total coverage is $TOTAL_COVERAGE%"
 
       - name: Show files with coverage < 80%
         run: |
           echo "Files with coverage below 80%:"
-          awk '/^\s+[0-9]+%/ { 
+          awk '/^[[:space:]]*[0-9]+%/ {
                   split($1, a, "%"); 
                   if (a[1] < 80) print $0 
                }' coverage.txt || true
@@ -50,4 +50,3 @@ jobs:
           else
             echo "✅ Total coverage is sufficient."
           fi
-
