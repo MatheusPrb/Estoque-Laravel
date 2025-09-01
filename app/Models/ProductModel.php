@@ -22,6 +22,8 @@ class ProductModel extends Model
         'amount',
     ];
 
+    protected $dates = ['deleted_at'];
+
     protected $keyType = 'string';
     public $incrementing = false;
 
