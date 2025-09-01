@@ -26,29 +26,19 @@ jobs:
 
       - name: Extract total coverage
         run: |
-          # Extrai o percentual total
           TOTAL_COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
           if [ -z "$TOTAL_COVERAGE" ]; then
             TOTAL_COVERAGE=0
           fi
-          echo "TOTAL_COVERAGE=$TOTAL_COVERAGE"
+          echo "Total coverage: $TOTAL_COVERAGE%"
           echo "TOTAL_COVERAGE=$TOTAL_COVERAGE" >> $GITHUB_ENV
-
-      - name: Show files with coverage < 80% in table
-        run: |
-          echo "Files with coverage below 80%:"
-          printf "%-6s | %s\n" "PERCENT" "FILE"
-          printf "%-6s | %s\n" "------" "----"
-          awk '/^[[:space:]]*[0-9]+%/ {
-                  split($1, a, "%"); 
-                  if (a[1] < 80) printf "%-6s | %s\n", $1, $2
-              }' coverage.txt || true
 
       - name: Fail if coverage < 80%
         run: |
           if [ "$TOTAL_COVERAGE" -lt 80 ]; then
-            echo "❌ Total coverage below 80%!"
+            echo "❌ Total coverage: $TOTAL_COVERAGE% — below 80%!"
             exit 1
           else
-            echo "✅ Total coverage is sufficient."
+            echo "✅ Total coverage: $TOTAL_COVERAGE% — sufficient."
           fi
+
