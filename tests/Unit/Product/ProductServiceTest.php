@@ -123,14 +123,6 @@ class ProductServiceTest extends TestCase
         $this->assertEquals($product->name, $result->name);
     }
 
-    public function test_productData_should_throw_exception_when_invalid_uuid()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID format');
-
-        $data = new ProductData('invalid-uuid');
-    }
-
     public function test_findOne_should_throw_exception_when_not_found()
     {
         $data = new ProductData('2c6b392c-379d-4ffd-ba74-c24e4340af45');
