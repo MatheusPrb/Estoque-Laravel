@@ -25,29 +25,27 @@ jobs:
         run: ./vendor/bin/phpunit --coverage-text --whitelist app/Services > coverage.txt || true
 
       - name: Extract coverage percentage
-        id: coverage
         run: |
-          # Pega a primeira linha que contém o total da cobertura
-          COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
-          echo "Coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          # Extrai o percentual total
+          TOTAL_COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
+          if [ -z "$TOTAL_COVERAGE" ]; then
+            TOTAL_COVERAGE=0
+          fi
+          echo "TOTAL_COVERAGE=$TOTAL_COVERAGE" >> $GITHUB_ENV
+          echo "Current total coverage is $TOTAL_COVERAGE%"
 
-      # - name: Comment coverage on PR
-      #   uses: peter-evans/create-or-update-comment@v4
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     body: |
-      #       🧪 **PHP Unit Test Coverage Report**
-      #       **Coverage:** ${{ steps.coverage.outputs.Coverage }}%
-      #       
-      #       ```text
-      #       $(cat coverage.txt)
-      #       ```
+      - name: Show files with coverage < 80%
+        run: |
+          echo "Files with coverage below 80%:"
+          awk '/^\s+[0-9]+%/ { 
+                  split($1, a, "%"); 
+                  if (a[1] < 80) print $0 
+               }' coverage.txt || true
 
       - name: Fail if coverage < 80%
         run: |
-          echo "Current coverage is ${{ steps.coverage.outputs.Coverage }}%"
-          if [ ${{ steps.coverage.outputs.Coverage }} -lt 80 ]; then
-            echo "❌ Coverage below 80%!"
+          if [ "$TOTAL_COVERAGE" -lt 80 ]; then
+            echo "❌ Total coverage below 80%!"
             exit 1
-          fi
+          else
+            echo "✅ Total coverage is sufficient."
