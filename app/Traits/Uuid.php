@@ -17,8 +17,10 @@ trait Uuid
     /**
      * Valida se uma string é um UUID válido.
      */
-    public function isValidUuid(string $uuid): bool
+    public static function checkUuid(string $uuid): void
     {
-        return Str::isUuid($uuid);
+        if (!Str::isUuid($uuid)) {
+            throw new \InvalidArgumentException('Invalid UUID format');
+        }
     }
 }

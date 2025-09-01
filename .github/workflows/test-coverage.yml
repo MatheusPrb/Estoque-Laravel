@@ -1,0 +1,68 @@
+name: Test Coverage
+
+on:
+  pull_request:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup PHP + Xdebug
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, xml, curl, xdebug
+          coverage: xdebug
+          ini-values: post_max_size=256M, upload_max_filesize=256M
+
+      # 3️⃣ Instalar dependências
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      # 4️⃣ Rodar testes apenas se houver alterações
+      - name: Run coverage only on changed files
+        run: |
+          # Descobre arquivos alterados na PR
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD | grep '^app/Services/' || true)
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No changes in app/Services, skipping coverage tests."
+            exit 0
+          fi
+
+          export XDEBUG_MODE=coverage
+          echo "Running coverage on changed files:"
+          echo "$CHANGED_FILES"
+
+          # Inicializa arquivo de cobertura
+          echo "" > coverage.txt
+
+          # Roda PHPUnit apenas nos arquivos alterados
+          for file in $CHANGED_FILES; do
+            echo "Testing $file"
+            ./vendor/bin/phpunit --testsuite=Unit --coverage-text --filter "$file" >> coverage.txt || true
+          done
+
+          # Mostra cobertura completa no log
+          cat coverage.txt
+
+          # Extrai cobertura total
+          TOTAL_COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
+          if [ -z "$TOTAL_COVERAGE" ]; then
+            TOTAL_COVERAGE=0
+          fi
+          echo "Total coverage: $TOTAL_COVERAGE%"
+
+          # Falha se cobertura < 80%
+          if [ "$TOTAL_COVERAGE" -lt 80 ]; then
+            echo "❌ Total coverage: $TOTAL_COVERAGE% — below 80%!"
+            exit 1
+          else
+            echo "✅ Total coverage: $TOTAL_COVERAGE% — sufficient."
+          fi
