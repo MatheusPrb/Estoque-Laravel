@@ -176,7 +176,7 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_update_amount_only()
     {
-        $data = new ProductData('uuid-edit-2', null, null, 99);
+        $data = new ProductData(ProductData::generateUuid(), null, null, 99);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto W', 'price' => 50.0, 'amount' => 10]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
@@ -191,7 +191,7 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_update_name_only()
     {
-        $data = new ProductData('uuid-edit-3', 'Novo Nome', null, null);
+        $data = new ProductData(ProductData::generateUuid(), 'Novo Nome', null, null);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto V', 'price' => 70.0, 'amount' => 7]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
@@ -207,7 +207,7 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_throw_exception_if_name_already_exists()
     {
-        $data = new ProductData('uuid-edit-4', 'Nome Existente', null, null);
+        $data = new ProductData(ProductData::generateUuid(), 'Nome Existente', null, null);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto T', 'price' => 80.0, 'amount' => 8]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
@@ -221,7 +221,7 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_update_multiple_fields()
     {
-        $data = new ProductData('uuid-edit-5', 'Produto Atualizado', 300.0, 15);
+        $data = new ProductData(ProductData::generateUuid(), 'Produto Atualizado', 300.0, 15);
         $product = new ProductModel(['id' => $data->id, 'name' => 'Produto S', 'price' => 100.0, 'amount' => 5]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
