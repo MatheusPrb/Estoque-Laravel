@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
 use App\Services\ProductService;
@@ -24,7 +25,7 @@ class ProductServiceTest extends TestCase
 
     public function test_create_product_success()
     {
-        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', 100.0, 10);
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', ProductStatusEnum::ACTIVE->value, 100.0, 10);
 
         $this->repository->method('validateName')->willReturn(false);
         $this->repository->method('create')->willReturn(new ProductModel([
@@ -42,7 +43,7 @@ class ProductServiceTest extends TestCase
 
     public function test_create_should_throw_exception_if_name_already_exists()
     {
-        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', 100.0, 10);
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', ProductStatusEnum::ACTIVE->value, 100.0, 10);
 
         $this->repository->method('validateName')->willReturn(true);
 
@@ -96,35 +97,161 @@ class ProductServiceTest extends TestCase
         $this->service->findAllPaginated(0, -1);
     }
 
-    public function test_findById_should_return_product_when_exists()
+    public function test_findAllPaginated_should_throw_exception_when_products_are_empty()
     {
-        $id = '123e4567-e89b-12d3-a456-426614174000';
-        $product = new ProductModel(['id' => $id, 'name' => 'Produto Z', 'price' => 50, 'amount' => 3]);
+        $products = $this->createMock(LengthAwarePaginator::class);
+        $products->method('isEmpty')->willReturn(true);
 
-        $this->repository->method('findById')->with($id)->willReturn($product);
+        $this->repository->method('findAllPaginated')->willReturn($products);
 
-        $result = $this->service->findById($id);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Nenhum produto encontrado.');
+
+        $result = $this->service->findAllPaginated(5, 1);
+    }
+
+    public function test_findOne_should_return_product_when_exists()
+    {
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000');
+        $product = new ProductModel(['id' => $data->id, 'name' => 'Produto Z', 'price' => 50, 'amount' => 3]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+
+        $result = $this->service->findOne($data);
 
         $this->assertInstanceOf(ProductModel::class, $result);
         $this->assertEquals($product->name, $result->name);
     }
 
-    public function test_findById_should_throw_exception_when_invalid_uuid()
+    public function test_productData_should_throw_exception_when_invalid_uuid()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid UUID format');
 
-        $this->service->findById('invalid-uuid');
+        $data = new ProductData('invalid-uuid');
     }
 
-    public function test_findById_should_throw_exception_when_not_found()
+    public function test_findOne_should_throw_exception_when_not_found()
     {
-        $id = '123e4567-e89b-12d3-a456-426614174000';
-        $this->repository->method('findById')->willReturn(null);
+        $data = new ProductData('2c6b392c-379d-4ffd-ba74-c24e4340af45');
+        $this->repository->method('findOne')->with($data)->willReturn(null);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Produto '{$id}' não encontrado.");
+        $this->expectExceptionMessage("Produto '{$data->id}' não encontrado.");
 
-        $this->service->findById($id);
+        $this->service->findOne($data);
+    }
+
+    public function test_edit_should_update_price_only()
+    {
+        $data = new ProductData(
+            ProductData::generateUuid(),
+            null,
+            null,
+            200.0,
+            null
+        );
+
+        $product = new ProductModel(
+            [
+                'id' => $data->id,
+                'name' => 'Produto Y',
+                'price' => 100.0,
+                'amount' => 5
+            ]
+        );
+
+        $this->repository
+            ->method('findOne')
+            ->with($data)
+            ->willReturn($product)
+        ;
+    
+        $this->repository->method('update')->willReturn($product);
+
+        $result = $this->service->edit($data);
+
+        $this->assertEquals(200.0, $result->price);
+        $this->assertEquals('Produto Y', $result->name);
+        $this->assertEquals(5, $result->amount);
+    }
+
+    public function test_edit_should_update_amount_only()
+    {
+        $data = new ProductData(ProductData::generateUuid(), null, null, null, 99);
+        $product = new ProductModel(['id' => $data->id, 'name' => 'Produto W', 'price' => 50.0, 'amount' => 10]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+        $this->repository->method('update')->willReturn($product);
+
+        $result = $this->service->edit($data);
+
+        $this->assertEquals(99, $result->amount);
+        $this->assertEquals('Produto W', $result->name);
+        $this->assertEquals(50.0, $result->price);
+    }
+
+    public function test_edit_should_update_name_only()
+    {
+        $data = new ProductData(ProductData::generateUuid(), 'Novo Nome', null, null, null);
+        $product = new ProductModel(['id' => $data->id, 'name' => 'Produto V', 'price' => 70.0, 'amount' => 7]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+        $this->repository->method('validateName')->willReturn(false);
+        $this->repository->method('update')->willReturn($product);
+
+        $result = $this->service->edit($data);
+
+        $this->assertEquals('Novo Nome', $result->name);
+        $this->assertEquals(70.0, $result->price);
+        $this->assertEquals(7, $result->amount);
+    }
+
+    public function test_edit_should_throw_exception_if_name_already_exists()
+    {
+        $data = new ProductData(ProductData::generateUuid(), 'Nome Existente', null, null, null);
+        $product = new ProductModel(['id' => $data->id, 'name' => 'Produto T', 'price' => 80.0, 'amount' => 8]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+        $this->repository->method('validateName')->willReturn(true);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Produto '{$data->name}' já cadastrado.");
+
+        $this->service->edit($data);
+    }
+
+    public function test_edit_should_update_multiple_fields()
+    {
+        $data = new ProductData(ProductData::generateUuid(), 'Produto Atualizado', null, 300.0, 15);
+        $product = new ProductModel(['id' => $data->id, 'name' => 'Produto S', 'price' => 100.0, 'amount' => 5]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+        $this->repository->method('validateName')->willReturn(false);
+        $this->repository->method('update')->willReturn($product);
+
+        $result = $this->service->edit($data);
+
+        $this->assertEquals('Produto Atualizado', $result->name);
+        $this->assertEquals(300.0, $result->price);
+        $this->assertEquals(15, $result->amount);
+    }
+
+    public function test_edit_should_update_status_only()
+    {
+        $data = new ProductData(ProductData::generateUuid(), 'Nome Qualquer', ProductStatusEnum::INACTIVE->value, null, null);
+        $product = new ProductModel(['id' => $data->id, 'name' => $data->name, 'price' => 150.0, 'amount' => 12, 'status' => ProductStatusEnum::ACTIVE->value]);
+
+        $this->repository->method('findOne')->with($data)->willReturn($product);
+        $this->repository->method('update')->willReturn($product);
+
+        $result = $this->service->edit($data);
+
+        $this->assertEquals(ProductStatusEnum::INACTIVE->value, $result->status);
+        $this->assertEquals($product->name, $result->name);
+        $this->assertEquals(150.0, $result->price);
+        $this->assertEquals(12, $result->amount);
+
+        $this->service->edit($data);
     }
 }

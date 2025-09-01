@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Services\ProductService;
+use App\Traits\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
+    use Uuid;
+
     private ProductService  $service ;
 
     public function __construct(ProductService $service)
@@ -21,7 +25,7 @@ class ProductController extends Controller
     {
         try {
             $params = $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'required|string',
                 'price' => 'required|numeric',
                 'amount' => 'required|integer',
             ]);
@@ -29,6 +33,7 @@ class ProductController extends Controller
             $productData = new ProductData(
                 ProductData::generateUuid(),
                 $params['name'],
+                ProductStatusEnum::ACTIVE->value,
                 $params['price'],
                 $params['amount']
             );
@@ -46,8 +51,13 @@ class ProductController extends Controller
     public function findAll(Request $request)
     {
        try {
-            $perPage = $request->query('per_page', 10);
-            $page    = $request->query('page', 1);
+            $validated = $request->validate([
+                'per_page' => 'integer|min:1',
+                'page' => 'integer|min:1',
+            ]);
+
+            $perPage = $validated['per_page'] ?? null;
+            $page    = $validated['page'] ?? null;
 
             $products = $this->service->findAllPaginated($perPage, $page);
 
@@ -62,9 +72,11 @@ class ProductController extends Controller
     public function findOne(string $id)
     {
         try {
-            $product = $this->service->findById($id);
+            $productData = new ProductData($id);
 
-            return response()->json($product->only(['id', 'name', 'price', 'amount']), 200);
+            $product = $this->service->findOne($productData);
+
+            return response()->json($product->only(['id', 'name','status', 'price', 'amount']), 200);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         } catch (\Exception $e) {
@@ -72,9 +84,25 @@ class ProductController extends Controller
         }
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        try {
+            $data = new ProductData(
+                $request->route('id'),
+                $request->input('name'),
+                $request->input('status'),
+                $request->input('price'),
+                $request->input('amount')
+            );
+
+            $product = $this->service->edit($data);
+
+            return response()->json($product->only(['id', 'name', 'status', 'price', 'amount']), 200);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     public function destroy(string $id)

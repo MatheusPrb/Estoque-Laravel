@@ -11,8 +11,10 @@ Route::post('/users', [UserController::class, 'store']);
 Route::post('/register/products', [ProductController::class, 'register']);
 
 // Rota de listagem de todos os produtos
-Route::get('/products', [ProductController::class, 'findAll']);
+Route::get('/all/products', [ProductController::class, 'findAll']);
 
 // Rota de listagem de um produto
 Route::get('/{id}/products', [ProductController::class, 'findOne']);
 
+// Rota de edição de um produto
+Route::patch('/edit/{id}/products', [ProductController::class, 'update']);
