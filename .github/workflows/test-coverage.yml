@@ -31,11 +31,18 @@ jobs:
           COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
           echo "Coverage=$COVERAGE" >> $GITHUB_OUTPUT
 
-      - name: Comment on PR with coverage
-        uses: marocchino/sticky-pull-request-comment@v2
+      - name: Comment coverage on PR
+        uses: peter-evans/create-or-update-comment@v4
         with:
-          path: coverage.txt
-          header: "🧪 PHP Unit Test Coverage Report"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🧪 **PHP Unit Test Coverage Report**
+            **Coverage:** ${{ steps.coverage.outputs.Coverage }}%
+            
+            ```text
+            $(cat coverage.txt)
+            ```
 
       - name: Fail if coverage < 80%
         run: |
