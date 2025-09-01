@@ -1,0 +1,46 @@
+name: Test Coverage
+
+on:
+  pull_request:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, xml, curl
+          ini-values: post_max_size=256M, upload_max_filesize=256M
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run tests with coverage
+        run: ./vendor/bin/phpunit --coverage-text --whitelist app/Services > coverage.txt || true
+
+      - name: Extract coverage percentage
+        id: coverage
+        run: |
+          # Pega a primeira linha que contém o total da cobertura
+          COVERAGE=$(grep -oP '\d+(?=%)' coverage.txt | head -1)
+          echo "Coverage=$COVERAGE" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with coverage
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: coverage.txt
+          header: "🧪 PHP Unit Test Coverage Report"
+
+      - name: Fail if coverage < 80%
+        run: |
+          echo "Current coverage is ${{ steps.coverage.outputs.Coverage }}%"
+          if [ ${{ steps.coverage.outputs.Coverage }} -lt 80 ]; then
+            echo "❌ Coverage below 80%!"
+            exit 1
+          fi

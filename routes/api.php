@@ -16,3 +16,5 @@ Route::get('/products', [ProductController::class, 'findAll']);
 // Rota de listagem de um produto
 Route::get('/{id}/products', [ProductController::class, 'findOne']);
 
+// Rota de edição de um produto
+Route::patch('/{id}/products', [ProductController::class, 'update']);

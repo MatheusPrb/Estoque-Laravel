@@ -3,20 +3,29 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
->
+         verbose="true">
+
+    <!-- Test suites -->
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests/Unit</directory>
+            <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
         </testsuite>
     </testsuites>
-    <source>
+
+    <!-- Code coverage only for Services -->
+    <coverage>
         <include>
-            <directory>app</directory>
+            <directory suffix=".php">app/Services</directory>
         </include>
-    </source>
+        <report>
+            <text outputFile="php://stdout"/>
+        </report>
+    </coverage>
+
+    <!-- Environment variables for testing -->
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>

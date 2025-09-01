@@ -44,8 +44,11 @@ class ProductService
         return $products;
     }
 
-    public function findAllPaginated(int $perPage = 10, int $page = 1): LengthAwarePaginator
+    public function findAllPaginated(?int $perPage = null, ?int $page = null): LengthAwarePaginator
     {
+        $perPage = $perPage ?? 10;
+        $page    = $page ?? 1;
+
         if ($perPage <= 0 || $page <= 0) {
             throw new \InvalidArgumentException('Parâmetros de paginação inválidos.');
         }
@@ -58,16 +61,34 @@ class ProductService
         return $products;
     }
 
-    public function findById(string $id): ProductModel
+    public function edit(ProductData $data): ProductModel
     {
-        if (!$this->isValidUuid($id)) {
-            throw new \InvalidArgumentException('Invalid UUID format');
+        $product = $this->repository->findById($data);
+
+        if ($data->price !== null) {
+            $product->price = $data->price;
         }
 
-        $product = $this->repository->findById($id);
+        if ($data->amount !== null) {
+            $product->amount = $data->amount;
+        }
 
+        if ($data->name !== null) {
+            $this->validateUniqueName($data);
+
+            $product->name = $data->name;
+        }
+
+        $this->repository->update($product);
+
+        return $product;
+    }
+
+    public function findById(ProductData $productData): ProductModel
+    {
+        $product = $this->repository->findById($productData);
         if (!$product) {
-            throw new \Exception("Produto '{$id}' não encontrado.");
+            throw new \Exception("Produto '{$productData->id}' não encontrado.");
         }
 
         return $product;
