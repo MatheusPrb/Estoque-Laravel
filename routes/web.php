@@ -21,3 +21,4 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::get('products', [ProductWebController::class, 'index'])->name('products.index');
+Route::get('products/{id}', [ProductWebController::class, 'show'])->name('products.show');

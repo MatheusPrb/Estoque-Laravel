@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProductStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -19,6 +20,13 @@ class ProductModel extends Model
         'price',
         'amount',
     ];
+
+    protected $appends = ['is_active'];
+
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === ProductStatusEnum::ACTIVE->value;
+    }
 
     protected $keyType = 'string';
     public $incrementing = false;

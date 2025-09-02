@@ -62,6 +62,7 @@
                                             @endif
                                         </a>
                                     </th>
+                                    {{-- Coluna Amount clicável para ordenação --}}
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => request('sort') === 'amount_asc' ? 'amount_desc' : 'amount_asc']) }}">
                                             Amount
@@ -77,6 +78,10 @@
                                             @elseif(request('sort') === 'created_at_desc') ↓
                                             @endif
                                         </a>
+                                    </th>
+                                    {{-- Coluna Ações --}}
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
@@ -94,6 +99,19 @@
                                         <td class="px-6 py-4 whitespace-nowrap">R$ {{ number_format($product->price, 2) }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $product->amount }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $product->created_at->format('d/m/Y H:i') }}</td>
+                                        {{-- Ação de visualizar detalhes --}}
+                                        <td class="px-6 py-4 whitespace-nowrap flex gap-2">
+                                            {{-- Visualizar --}}
+                                            <a href="{{ route('products.show', ['id' => $product->id]) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200" title="View">👁️</a>
+                                            {{-- Editar --}}
+                                            <a href="{{ route('products.index', ['id' => $product->id]) }}" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200" title="Edit">✏️</a>
+                                            {{-- Excluir --}}
+                                            <form action="{{ route('products.index', ['id' => $product->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200" title="Delete">🗑️</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>

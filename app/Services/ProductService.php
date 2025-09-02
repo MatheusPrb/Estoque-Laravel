@@ -91,7 +91,7 @@ class ProductService
     {
         $product = $this->repository->findOne($productData);
         if (!$product) {
-            throw new \Exception("Produto '{$productData->id}' não encontrado.");
+            throw new \Exception("Produto não encontrado.");
         }
 
         return $product;
