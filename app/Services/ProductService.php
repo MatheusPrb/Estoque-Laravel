@@ -65,21 +65,29 @@ class ProductService
         $product = $this->repository->findOne($data);
 
         if ($data->price !== null) {
-            $product->price = $data->price;
+            if ($data->price != $product->price) {
+                $product->price = $data->price;
+            }
         }
 
         if ($data->amount !== null) {
-            $product->amount = $data->amount;
+            if ($data->amount != $product->amount) {
+                $product->amount = $data->amount;
+            }
         }
 
         if ($data->name !== null) {
-            $this->validateUniqueName($data);
+            if ($data->name != $product->name) {
+                $this->validateUniqueName($data);
 
-            $product->name = $data->name;
+                $product->name = $data->name;
+            }
         }
 
         if ($data->status !== null) {
-            $product->status = $data->status;
+            if ($data->status != $product->status) {
+                $product->status = $data->status;
+            }
         }
 
         $this->repository->update($product);

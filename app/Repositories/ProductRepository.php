@@ -60,6 +60,6 @@ class ProductRepository implements ProductPersistenceInterface
 
     public function findOne(ProductData $data): ?ProductModel
     {
-        return ProductModel::find($data->id);
+        return ProductModel::withTrashed()->find($data->id);
     }
 }

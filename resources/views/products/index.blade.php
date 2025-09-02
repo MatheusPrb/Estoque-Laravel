@@ -104,7 +104,7 @@
                                             {{-- Visualizar --}}
                                             <a href="{{ route('products.show', ['id' => $product->id]) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200" title="View">👁️</a>
                                             {{-- Editar --}}
-                                            <a href="{{ route('products.index', ['id' => $product->id]) }}" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200" title="Edit">✏️</a>
+                                            <a href="{{ route('products.viewEdit', ['id' => $product->id]) }}" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200" title="Edit">✏️</a>
                                             {{-- Excluir --}}
                                             <form action="{{ route('products.index', ['id' => $product->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                                 @csrf
