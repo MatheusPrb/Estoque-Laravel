@@ -62,4 +62,13 @@ class ProductRepository implements ProductPersistenceInterface
     {
         return ProductModel::withTrashed()->find($data->id);
     }
+
+    public function delete(ProductModel $product): void
+    {
+        $product->status = ProductStatusEnum::INACTIVE->value;
+        $product->amount = 0;
+        $product->save();
+
+        $product->delete();
+    }
 }

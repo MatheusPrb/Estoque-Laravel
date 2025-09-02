@@ -74,4 +74,16 @@ class ProductWebController extends Controller
         }
     }
 
+    public function destroy(string $id)
+    {
+        try {
+            $productData = new ProductData($id);
+
+            $this->service->delete($productData);
+
+            return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('products.index')->withInput()->withErrors([$e->getMessage()]);
+        }
+    }
 }

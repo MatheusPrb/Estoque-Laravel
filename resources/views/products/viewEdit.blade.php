@@ -66,8 +66,8 @@
                         {{-- BOTÕES --}}
                         <div class="flex justify-end gap-2">
                             <a href="{{ route('products.index') }}"
-                               class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600">
-                               Cancel
+                               class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
+                               Back to List
                             </a>
                             <button type="submit"
                                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600">

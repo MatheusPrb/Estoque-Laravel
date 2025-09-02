@@ -24,3 +24,4 @@ Route::get('products', [ProductWebController::class, 'index'])->name('products.i
 Route::get('products/{id}', [ProductWebController::class, 'show'])->name('products.show');
 Route::get('products/{id}/edit', [ProductWebController::class, 'viewEdit'])->name('products.viewEdit');
 Route::put('products/{id}', [ProductWebController::class, 'update'])->name('products.update');
+Route::delete('products/{id}', [ProductWebController::class, 'destroy'])->name('products.destroy');

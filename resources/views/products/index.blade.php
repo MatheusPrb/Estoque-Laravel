@@ -19,6 +19,15 @@
                         </div>
                     @endif
 
+                    {{-- MENSAGENS DE SUCESSO --}}
+                    @if(session('success'))
+                        <div class="mb-4 text-sm text-green-500 dark:text-green-400">
+                            @foreach((array) session('success') as $message)
+                                <p>{{ $message }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+
                     {{-- FILTROS --}}
                     <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <form method="GET" class="flex flex-wrap gap-2 sm:gap-4 w-full">
@@ -106,7 +115,7 @@
                                             {{-- Editar --}}
                                             <a href="{{ route('products.viewEdit', ['id' => $product->id]) }}" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200" title="Edit">✏️</a>
                                             {{-- Excluir --}}
-                                            <form action="{{ route('products.index', ['id' => $product->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                            <form action="{{ route('products.destroy', ['id' => $product->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200" title="Delete">🗑️</button>
