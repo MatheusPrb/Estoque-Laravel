@@ -15,6 +15,8 @@ class ProductFilterRequest extends FormRequest
     public const SORT_MAP = [
         'price_asc'       => ['price', 'asc'],
         'price_desc'      => ['price', 'desc'],
+        'amount_asc'      => ['amount', 'asc'],
+        'amount_desc'     => ['amount', 'desc'],
         'created_at_asc'  => ['created_at', 'asc'],
         'created_at_desc' => ['created_at', 'desc'],
         'deleted_at_asc'  => ['deleted_at', 'asc'],

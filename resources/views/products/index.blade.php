@@ -10,19 +10,18 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                {{-- MENSAGENS DE ERRO --}}
-                @if($errors->any())
-                    <div class="mb-2 text-sm text-red-500 dark:text-red-400">
-                        @foreach($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
-                @endif
+                    {{-- MENSAGENS DE ERRO --}}
+                    @if($errors->any())
+                        <div class="mb-2 text-sm text-red-500 dark:text-red-400">
+                            @foreach($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
 
-                    {{-- FILTROS E ORDENAÇÃO --}}
+                    {{-- FILTROS --}}
                     <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <form method="GET" class="flex flex-wrap gap-2 sm:gap-4 w-full">
-
                             {{-- Filtro por Nome --}}
                             <input type="text" name="name" value="{{ request('name') }}" placeholder="Search by name"
                                 class="px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring focus:ring-blue-500 dark:focus:ring-blue-400">
@@ -33,14 +32,6 @@
                                 <option value="">All Status</option>
                                 <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
                                 <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Disabled</option>
-                            </select>
-
-                            {{-- Ordenação --}}
-                            <select name="sort"
-                                class="px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring focus:ring-blue-500 dark:focus:ring-blue-400">
-                                <option value="">Sort by</option>
-                                <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price ↑</option>
-                                <option value="price_desc" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price ↓</option>
                             </select>
 
                             <button type="submit"
@@ -62,14 +53,30 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                                         Status
                                     </th>
+                                    {{-- Coluna Price clicável para ordenação --}}
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                                        Price
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => request('sort') === 'price_asc' ? 'price_desc' : 'price_asc']) }}">
+                                            Price
+                                            @if(request('sort') === 'price_asc') ↑
+                                            @elseif(request('sort') === 'price_desc') ↓
+                                            @endif
+                                        </a>
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                                        Amount
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => request('sort') === 'amount_asc' ? 'amount_desc' : 'amount_asc']) }}">
+                                            Amount
+                                            @if(request('sort') === 'amount_asc') ↑
+                                            @elseif(request('sort') === 'amount_desc') ↓
+                                            @endif
+                                        </a>
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                                        Created At
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => request('sort') === 'created_at_asc' ? 'created_at_desc' : 'created_at_asc']) }}">
+                                            Created At
+                                            @if(request('sort') === 'created_at_asc') ↑
+                                            @elseif(request('sort') === 'created_at_desc') ↓
+                                            @endif
+                                        </a>
                                     </th>
                                 </tr>
                             </thead>

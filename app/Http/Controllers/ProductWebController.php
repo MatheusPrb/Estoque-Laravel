@@ -11,7 +11,6 @@ class ProductWebController extends Controller
 {
     private ProductService $service;
 
-
     public function __construct(ProductService $service)
     {
         $this->service = $service;
