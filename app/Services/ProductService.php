@@ -64,33 +64,26 @@ class ProductService
     {
         $product = $this->repository->findOne($data);
 
-        if ($data->price !== null) {
-            if ($data->price != $product->price) {
-                $product->price = $data->price;
-            }
+        if ($data->price !== null && $data->price != $product->price) {
+            $product->price = $data->price;
         }
 
-        if ($data->amount !== null) {
-            if ($data->amount != $product->amount) {
-                $product->amount = $data->amount;
-            }
+        if ($data->amount !== null && $data->amount != $product->amount) {
+            $product->amount = $data->amount;
         }
 
-        if ($data->name !== null) {
-            if ($data->name != $product->name) {
-                $this->validateUniqueName($data);
-
-                $product->name = $data->name;
-            }
+        if ($data->name !== null && $data->name != $product->name) {
+            $this->validateUniqueName($data);
+            $product->name = $data->name;
         }
 
-        if ($data->status !== null) {
-            if ($data->status != $product->status) {
-                $product->status = $data->status;
-            }
+        if ($data->status !== null && $data->status != $product->status) {
+            $product->status = $data->status;
         }
 
-        $this->repository->update($product);
+        if ($product->isDirty()) {
+            $this->repository->update($product);
+        }
 
         return $product;
     }
