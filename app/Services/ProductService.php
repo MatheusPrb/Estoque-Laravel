@@ -58,7 +58,12 @@ class ProductService
             throw new \InvalidArgumentException('Parâmetros de paginação inválidos.');
         }
 
-        return $this->repository->findAllPaginated($perPage, $page, $filters);
+        $products = $this->repository->findAllPaginated($perPage, $page, $filters);
+        if ($products->isEmpty()) {
+            throw new \Exception('Nenhum produto encontrado.');
+        }
+
+        return $products;
     }
 
     public function edit(ProductData $data): ProductModel
