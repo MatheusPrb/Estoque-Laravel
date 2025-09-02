@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class ProductModel extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'product';
-
     public $timestamps = true;
-
     protected $fillable = [
         'id',
         'name',
