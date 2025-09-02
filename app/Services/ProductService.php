@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\ProductData;
+use App\Http\Requests\ProductFilterRequest;
 use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
 use App\Traits\Uuid;
@@ -12,6 +13,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class ProductService
 {
     use Uuid;
+
+    public const DEFAULT_PER_PAGE = 10;
+    public const DEFAULT_PAGE = 1;
 
     private ProductPersistenceInterface $repository;
 
@@ -44,21 +48,16 @@ class ProductService
         return $products;
     }
 
-    public function findAllPaginated(?int $perPage = null, ?int $page = null): LengthAwarePaginator
+    public function findAllPaginated(array $filters = []): LengthAwarePaginator
     {
-        $perPage = $perPage ?? 10;
-        $page    = $page ?? 1;
+        $perPage = (int) ($filters[ProductFilterRequest::PER_PAGE] ?? self::DEFAULT_PER_PAGE);
+        $page    = (int) ($filters[ProductFilterRequest::PAGE] ?? self::DEFAULT_PAGE);
 
         if ($perPage <= 0 || $page <= 0) {
             throw new \InvalidArgumentException('Parâmetros de paginação inválidos.');
         }
 
-        $products = $this->repository->findAllPaginated($perPage, $page);
-        if ($products->isEmpty()) {
-            throw new \Exception('Nenhum produto encontrado.');
-        }
-
-        return $products;
+        return $this->repository->findAllPaginated($perPage, $page, $filters);
     }
 
     public function edit(ProductData $data): ProductModel

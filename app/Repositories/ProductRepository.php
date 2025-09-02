@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Http\Requests\ProductFilterRequest;
 use App\Models\ProductModel;
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -29,9 +31,25 @@ class ProductRepository implements ProductPersistenceInterface
         return ProductModel::all();
     }
 
-    public function findAllPaginated(int $perPage, int $page): LengthAwarePaginator
+    public function findAllPaginated(int $perPage, int $page, array $filters = []): LengthAwarePaginator
     {
-        return ProductModel::paginate($perPage, ['*'], 'page', $page);
+        $query = ProductModel::query();
+
+        if (isset($filters['name'])) {
+            $query->where('name', 'like', '%' . $filters['name'] . '%');
+        }
+
+        if (isset($filters['status'])) {
+            $query->where('status', ProductStatusEnum::translateStatus($filters['status']));
+        }
+
+        if (isset($filters['sort'])) {
+            $sortMap = ProductFilterRequest::matchSort($filters['sort']);
+
+            $query->orderBy($sortMap[0], $sortMap[1]);
+        }
+
+        return $query->withTrashed()->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function update(ProductModel $product): ProductModel
