@@ -32,6 +32,12 @@
                         <strong>Created At:</strong> {{ $product->created_at->format('d/m/Y H:i') }}
                     </div>
 
+                    @if (!$product->isActive)
+                        <div class="mb-2">
+                            <strong>Deleted At:</strong> {{ $product->deleted_at->format('d/m/Y H:i') }}
+                        </div>
+                    @endif
+
                     <div class="mt-4">
                         <a href="{{ route('products.index') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600">
                             Back to List
