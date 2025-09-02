@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use App\Http\Requests\ProductFilterRequest;
 use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
@@ -101,6 +102,11 @@ class ProductService
     public function delete(ProductData $productData): void
     {
         $product = $this->repository->findOne($productData);
+
+        if ($product->status === ProductStatusEnum::INACTIVE->value) {
+           throw new \Exception("Produto {$product->name} já está inativo.");
+        }
+
         if (!$product) {
             throw new \Exception("Produto não encontrado.");
         }
