@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductWebController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,3 +19,9 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('products', [ProductWebController::class, 'index'])->name('products.index');
+Route::get('products/{id}', [ProductWebController::class, 'show'])->name('products.show');
+Route::get('products/{id}/edit', [ProductWebController::class, 'viewEdit'])->name('products.viewEdit');
+Route::put('products/{id}', [ProductWebController::class, 'update'])->name('products.update');
+Route::delete('products/{id}', [ProductWebController::class, 'destroy'])->name('products.destroy');

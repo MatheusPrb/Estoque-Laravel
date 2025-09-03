@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
+use App\Http\Requests\ProductFilterRequest;
 use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
 use App\Traits\Uuid;
@@ -12,6 +14,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class ProductService
 {
     use Uuid;
+
+    public const DEFAULT_PER_PAGE = 10;
+    public const DEFAULT_PAGE = 1;
 
     private ProductPersistenceInterface $repository;
 
@@ -44,16 +49,16 @@ class ProductService
         return $products;
     }
 
-    public function findAllPaginated(?int $perPage = null, ?int $page = null): LengthAwarePaginator
+    public function findAllPaginated(array $filters = []): LengthAwarePaginator
     {
-        $perPage = $perPage ?? 10;
-        $page    = $page ?? 1;
+        $perPage = (int) ($filters[ProductFilterRequest::PER_PAGE] ?? self::DEFAULT_PER_PAGE);
+        $page    = (int) ($filters[ProductFilterRequest::PAGE] ?? self::DEFAULT_PAGE);
 
         if ($perPage <= 0 || $page <= 0) {
             throw new \InvalidArgumentException('Parâmetros de paginação inválidos.');
         }
 
-        $products = $this->repository->findAllPaginated($perPage, $page);
+        $products = $this->repository->findAllPaginated($perPage, $page, $filters);
         if ($products->isEmpty()) {
             throw new \Exception('Nenhum produto encontrado.');
         }
@@ -65,25 +70,26 @@ class ProductService
     {
         $product = $this->repository->findOne($data);
 
-        if ($data->price !== null) {
+        if ($data->price !== null && $data->price != $product->price) {
             $product->price = $data->price;
         }
 
-        if ($data->amount !== null) {
+        if ($data->amount !== null && $data->amount != $product->amount) {
             $product->amount = $data->amount;
         }
 
-        if ($data->name !== null) {
+        if ($data->name !== null && $data->name != $product->name) {
             $this->validateUniqueName($data);
-
             $product->name = $data->name;
         }
 
-        if ($data->status !== null) {
+        if ($data->status !== null && $data->status != $product->status) {
             $product->status = $data->status;
         }
 
-        $this->repository->update($product);
+        if ($product->isDirty()) {
+            $this->repository->update($product);
+        }
 
         return $product;
     }
@@ -92,9 +98,24 @@ class ProductService
     {
         $product = $this->repository->findOne($productData);
         if (!$product) {
-            throw new \Exception("Produto '{$productData->id}' não encontrado.");
+            throw new \Exception("Produto não encontrado.");
         }
 
         return $product;
+    }
+
+    public function delete(ProductData $productData): void
+    {
+        $product = $this->repository->findOne($productData);
+
+        if ($product->status === ProductStatusEnum::INACTIVE->value) {
+           throw new \Exception("Produto {$product->name} já está inativo.");
+        }
+
+        if (!$product) {
+            throw new \Exception("Produto não encontrado.");
+        }
+
+        $this->repository->delete($product);
     }
 }
