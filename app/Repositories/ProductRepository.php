@@ -23,7 +23,7 @@ class ProductRepository implements ProductPersistenceInterface
 
     public function validateName(ProductData $data): bool
     {
-        return ProductModel::where('name', $data->name)->exists();
+        return ProductModel::withTrashed()->where('name', $data->name)->exists();
     }
 
     public function findAll(): Collection
