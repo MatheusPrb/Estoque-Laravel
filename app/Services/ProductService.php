@@ -144,7 +144,7 @@ class ProductService
         }
     
         if ($product->status === ProductStatusEnum::INACTIVE->value) {
-           throw new \Exception("Produto {$product->name} já está inativo.");
+           throw new \Exception("Produto {$product->name} já está desativado.");
         }
 
         $this->repository->delete($product);
