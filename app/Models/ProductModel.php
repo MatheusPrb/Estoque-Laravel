@@ -27,6 +27,7 @@ class ProductModel extends Model
     {
         return $this->status === ProductStatusEnum::ACTIVE->value;
     }
+    protected $dates = ['deleted_at'];
 
     protected $keyType = 'string';
     public $incrementing = false;

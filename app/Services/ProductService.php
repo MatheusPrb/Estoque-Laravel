@@ -108,12 +108,12 @@ class ProductService
     {
         $product = $this->repository->findOne($productData);
 
-        if ($product->status === ProductStatusEnum::INACTIVE->value) {
-           throw new \Exception("Produto {$product->name} já está inativo.");
-        }
-
         if (!$product) {
             throw new \Exception("Produto não encontrado.");
+        }
+    
+        if ($product->status === ProductStatusEnum::INACTIVE->value) {
+           throw new \Exception("Produto {$product->name} já está inativo.");
         }
 
         $this->repository->delete($product);
