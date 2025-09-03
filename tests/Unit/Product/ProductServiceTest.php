@@ -236,20 +236,20 @@ class ProductServiceTest extends TestCase
         $this->assertEquals(15, $result->amount);
     }
 
-    public function test_edit_should_update_status_only()
+    public function test_edit_should_update_status_and_amount()
     {
         $data = new ProductData(ProductData::generateUuid(), 'Nome Qualquer', '0', null, null);
-        $product = new ProductModel(['id' => $data->id, 'name' => $data->name, 'price' => 150.0, 'amount' => 12, 'status' => '1']);
+        $product = new ProductModel(['id' => $data->id, 'name' => $data->name, 'price' => 150.0, 'amount' => 12, 'status' => ProductStatusEnum::ACTIVE->value]);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
         $this->repository->method('update')->willReturn($product);
 
         $result = $this->service->edit($data);
 
-        $this->assertEquals('0', $result->status);
+        $this->assertEquals(ProductStatusEnum::INACTIVE->value, $result->status);
         $this->assertEquals($product->name, $result->name);
         $this->assertEquals(150.0, $result->price);
-        $this->assertEquals(12, $result->amount);
+        $this->assertEquals(0, $result->amount);
 
         $this->service->edit($data);
     }

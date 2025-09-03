@@ -55,6 +55,7 @@ class ProductRepository implements ProductPersistenceInterface
     public function update(ProductModel $product): ProductModel
     {
         $product->save();
+
         return $product;
     }
 

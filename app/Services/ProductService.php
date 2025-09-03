@@ -65,28 +65,64 @@ class ProductService
     {
         $product = $this->repository->findOne($data);
 
-        if ($data->price !== null && $data->price != $product->price) {
-            $product->price = $data->price;
-        }
-
-        if ($data->amount !== null && $data->amount != $product->amount) {
-            $product->amount = $data->amount;
-        }
-
-        if ($data->name !== null && $data->name != $product->name) {
-            $this->validateUniqueName($data);
-            $product->name = $data->name;
-        }
-
-        if ($data->status !== null && $data->status != $product->status) {
-            $product->status = $data->status;
-        }
+        $this->updatePrice($product, $data);
+        $this->updateAmount($product, $data);
+        $this->updateName($product, $data);
+        $this->updateStatus($product, $data);
 
         if ($product->isDirty()) {
             $this->repository->update($product);
         }
 
         return $product;
+    }
+
+    private function updatePrice(ProductModel $product, ProductData $data): void
+    {
+        if ($data->price !== null && $data->price != $product->price) {
+            $product->price = $data->price;
+        }
+    }
+
+    private function updateAmount(ProductModel $product, ProductData $data): void
+    {
+        if ($data->amount !== null && $data->amount != $product->amount) {
+            $product->amount = $data->amount;
+
+            $this->syncStatusWithAmount($product, $data);
+        }
+    }
+
+    private function updateName(ProductModel $product, ProductData $data): void
+    {
+        if ($data->name !== null && $data->name != $product->name) {
+            $this->validateUniqueName($data);
+
+            $product->name = $data->name;
+        }
+    }
+
+    private function updateStatus(ProductModel $product, ProductData $data): void
+    {
+        if ($data->status !== null && $data->status != $product->status) {
+            $product->status = ProductStatusEnum::translateStatus($data->status);
+            
+            $this->syncAmountWithStatus($product);
+        }
+    }
+
+    private function syncStatusWithAmount(ProductModel $product, ProductData $data): void
+    {
+        $data->status = $product->amount > 0
+            ? ProductStatusEnum::ACTIVE->value
+            : ProductStatusEnum::INACTIVE->value;
+    }
+
+    private function syncAmountWithStatus(ProductModel $product): void
+    {
+        if ($product->status == ProductStatusEnum::INACTIVE->value) {
+            $product->amount = 0;
+        }
     }
 
     public function findOne(ProductData $productData): ProductModel
