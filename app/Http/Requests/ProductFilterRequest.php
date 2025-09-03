@@ -21,6 +21,8 @@ class ProductFilterRequest extends FormRequest
         'created_at_desc' => ['created_at', 'desc'],
         'deleted_at_asc'  => ['deleted_at', 'asc'],
         'deleted_at_desc' => ['deleted_at', 'desc'],
+        'status_asc'      => ['status', 'asc'],
+        'status_desc'     => ['status', 'desc'],
     ];
 
     /**
