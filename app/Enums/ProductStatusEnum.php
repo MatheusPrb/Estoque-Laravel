@@ -16,4 +16,13 @@ enum ProductStatusEnum: string
     {
         return in_array($status, self::VALID_STATUSES, true);
     }
+
+    public static function translateStatus(string $status): ?string
+    {
+        return match ($status) {
+            '1' => self::ACTIVE->value,
+            '0' => self::INACTIVE->value,
+            default => '',
+        };
+    }
 }

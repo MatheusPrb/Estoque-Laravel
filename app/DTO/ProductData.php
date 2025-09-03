@@ -36,7 +36,7 @@ class ProductData
         }
 
         if ($this->status !== null) {
-            if (!ProductStatusEnum::isValidStatus($this->status)) {
+            if (!ProductStatusEnum::isValidStatus(ProductStatusEnum::translateStatus($this->status))) {
                 throw new \InvalidArgumentException('Invalid product status');
             }
         }

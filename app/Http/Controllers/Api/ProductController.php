@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\ProductData;
-use App\Enums\ProductStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductFilterRequest;
 use App\Services\ProductService;
 use App\Traits\Uuid;
 use Illuminate\Http\Request;
@@ -33,7 +33,7 @@ class ProductController extends Controller
             $productData = new ProductData(
                 ProductData::generateUuid(),
                 $params['name'],
-                ProductStatusEnum::ACTIVE->value,
+                '1',
                 $params['price'],
                 $params['amount']
             );
@@ -56,10 +56,12 @@ class ProductController extends Controller
                 'page' => 'integer|min:1',
             ]);
 
-            $perPage = $validated['per_page'] ?? null;
-            $page    = $validated['page'] ?? null;
+            $filters = [
+                ProductFilterRequest::PER_PAGE => $validated[ProductFilterRequest::PER_PAGE] ?? null,
+                ProductFilterRequest::PAGE => $validated[ProductFilterRequest::PAGE] ?? null,
+            ];
 
-            $products = $this->service->findAllPaginated($perPage, $page);
+            $products = $this->service->findAllPaginated($filters);
 
             return response()->json($products->toArray(), 200);
         } catch (\InvalidArgumentException $e) {
@@ -105,8 +107,18 @@ class ProductController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function delete(Request $request)
     {
-        //
+        try {
+            $productData = new ProductData($request->route('id'));
+
+            $this->service->delete($productData);
+
+            return response()->json(['message' => 'Product deleted successfully'], 200);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 }

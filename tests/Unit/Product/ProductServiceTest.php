@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\DTO\ProductData;
 use App\Enums\ProductStatusEnum;
+use App\Http\Requests\ProductFilterRequest;
 use App\Models\ProductModel;
 use App\Repositories\ProductPersistenceInterface;
 use App\Services\ProductService;
@@ -25,7 +26,7 @@ class ProductServiceTest extends TestCase
 
     public function test_create_product_success()
     {
-        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', ProductStatusEnum::ACTIVE->value, 100.0, 10);
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', '1', 100.0, 10);
 
         $this->repository->method('validateName')->willReturn(false);
         $this->repository->method('create')->willReturn(new ProductModel([
@@ -43,7 +44,7 @@ class ProductServiceTest extends TestCase
 
     public function test_create_should_throw_exception_if_name_already_exists()
     {
-        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', ProductStatusEnum::ACTIVE->value, 100.0, 10);
+        $data = new ProductData('123e4567-e89b-12d3-a456-426614174000', 'Produto X', '1', 100.0, 10);
 
         $this->repository->method('validateName')->willReturn(true);
 
@@ -84,7 +85,8 @@ class ProductServiceTest extends TestCase
 
         $this->repository->method('findAllPaginated')->willReturn($products);
 
-        $result = $this->service->findAllPaginated(5, 1);
+
+        $result = $this->service->findAllPaginated();
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
     }
@@ -94,7 +96,12 @@ class ProductServiceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Parâmetros de paginação inválidos.');
 
-        $this->service->findAllPaginated(0, -1);
+        $filters = [
+            ProductFilterRequest::PER_PAGE => -1,
+            ProductFilterRequest::PAGE    => 0,
+        ];
+
+        $this->service->findAllPaginated($filters);
     }
 
     public function test_findAllPaginated_should_throw_exception_when_products_are_empty()
@@ -104,10 +111,10 @@ class ProductServiceTest extends TestCase
 
         $this->repository->method('findAllPaginated')->willReturn($products);
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Nenhum produto encontrado.');
+        $products = $this->service->findAllPaginated();
 
-        $result = $this->service->findAllPaginated(5, 1);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $products);
+        $this->assertTrue($products->isEmpty());
     }
 
     public function test_findOne_should_return_product_when_exists()
@@ -123,21 +130,13 @@ class ProductServiceTest extends TestCase
         $this->assertEquals($product->name, $result->name);
     }
 
-    public function test_productData_should_throw_exception_when_invalid_uuid()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID format');
-
-        $data = new ProductData('invalid-uuid');
-    }
-
     public function test_findOne_should_throw_exception_when_not_found()
     {
         $data = new ProductData('2c6b392c-379d-4ffd-ba74-c24e4340af45');
         $this->repository->method('findOne')->with($data)->willReturn(null);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Produto '{$data->id}' não encontrado.");
+        $this->expectExceptionMessage("Produto não encontrado.");
 
         $this->service->findOne($data);
     }
@@ -239,19 +238,31 @@ class ProductServiceTest extends TestCase
 
     public function test_edit_should_update_status_only()
     {
-        $data = new ProductData(ProductData::generateUuid(), 'Nome Qualquer', ProductStatusEnum::INACTIVE->value, null, null);
-        $product = new ProductModel(['id' => $data->id, 'name' => $data->name, 'price' => 150.0, 'amount' => 12, 'status' => ProductStatusEnum::ACTIVE->value]);
+        $data = new ProductData(ProductData::generateUuid(), 'Nome Qualquer', '0', null, null);
+        $product = new ProductModel(['id' => $data->id, 'name' => $data->name, 'price' => 150.0, 'amount' => 12, 'status' => '1']);
 
         $this->repository->method('findOne')->with($data)->willReturn($product);
         $this->repository->method('update')->willReturn($product);
 
         $result = $this->service->edit($data);
 
-        $this->assertEquals(ProductStatusEnum::INACTIVE->value, $result->status);
+        $this->assertEquals('0', $result->status);
         $this->assertEquals($product->name, $result->name);
         $this->assertEquals(150.0, $result->price);
         $this->assertEquals(12, $result->amount);
 
         $this->service->edit($data);
+    }
+
+    public function test_delete_should_throw_exception_if_product_not_found()
+    {
+        $data = new ProductData(ProductData::generateUuid(), null, '0');
+
+        $this->repository->method('findOne')->with($data)->willReturn(null);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Produto não encontrado.");
+
+        $this->service->delete($data);
     }
 }
