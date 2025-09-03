@@ -22,7 +22,7 @@ enum ProductStatusEnum: string
         return match ($status) {
             '1' => self::ACTIVE->value,
             '0' => self::INACTIVE->value,
-            default => null,
+            default => '',
         };
     }
 }

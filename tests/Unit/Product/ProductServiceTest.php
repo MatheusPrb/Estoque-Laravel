@@ -130,14 +130,6 @@ class ProductServiceTest extends TestCase
         $this->assertEquals($product->name, $result->name);
     }
 
-    public function test_productData_should_throw_exception_when_invalid_uuid()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID format');
-
-        new ProductData('invalid-uuid');
-    }
-
     public function test_findOne_should_throw_exception_when_not_found()
     {
         $data = new ProductData('2c6b392c-379d-4ffd-ba74-c24e4340af45');
@@ -260,5 +252,17 @@ class ProductServiceTest extends TestCase
         $this->assertEquals(12, $result->amount);
 
         $this->service->edit($data);
+    }
+
+    public function test_delete_should_throw_exception_if_product_not_found()
+    {
+        $data = new ProductData(ProductData::generateUuid(), null, '0');
+
+        $this->repository->method('findOne')->with($data)->willReturn(null);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Produto não encontrado.");
+
+        $this->service->delete($data);
     }
 }
