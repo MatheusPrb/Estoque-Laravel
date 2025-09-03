@@ -7,7 +7,6 @@ use App\Models\ProductModel;
 use App\Enums\ProductStatusEnum;
 use App\Traits\Uuid;
 use Faker\Factory as Faker;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class ProductSeeder extends Seeder
@@ -27,7 +26,7 @@ class ProductSeeder extends Seeder
                 'name' => $faker->words(2, true),
                 'status' => $status,
                 'price' => $faker->randomFloat(2, 10, 1000),
-                'amount' => $faker->numberBetween(1, 50),
+                'amount' => $isDeleted ? 0 : $faker->numberBetween(1, 50),
                 'deleted_at' => $isDeleted ? Carbon::now() : null
             ]);
         }
