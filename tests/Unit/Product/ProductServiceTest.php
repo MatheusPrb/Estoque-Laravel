@@ -111,10 +111,10 @@ class ProductServiceTest extends TestCase
 
         $this->repository->method('findAllPaginated')->willReturn($products);
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Nenhum produto encontrado.');
+        $products = $this->service->findAllPaginated();
 
-        $this->service->findAllPaginated();
+        $this->assertInstanceOf(LengthAwarePaginator::class, $products);
+        $this->assertTrue($products->isEmpty());
     }
 
     public function test_findOne_should_return_product_when_exists()
