@@ -36,7 +36,7 @@ class ProductRepository implements ProductPersistenceInterface
         $query = ProductModel::query();
 
         if (isset($filters['name'])) {
-            $query->where('name', 'like', '%' . $filters['name'] . '%');
+            $query->where('name', 'like', $filters['name'] . '%');
         }
 
         if (isset($filters['status'])) {
@@ -55,6 +55,7 @@ class ProductRepository implements ProductPersistenceInterface
     public function update(ProductModel $product): ProductModel
     {
         $product->save();
+
         return $product;
     }
 
