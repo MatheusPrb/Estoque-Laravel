@@ -36,7 +36,7 @@ class ProductRepository implements ProductPersistenceInterface
         $query = ProductModel::query();
 
         if (isset($filters['name'])) {
-            $query->where('name', 'like', '%' . $filters['name'] . '%');
+            $query->where('name', 'like', $filters['name'] . '%');
         }
 
         if (isset($filters['status'])) {
