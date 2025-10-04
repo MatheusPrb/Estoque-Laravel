@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\ProductData;
+use App\Enums\ProductStatusEnum;
 use App\Http\Requests\ProductFilterRequest;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -84,6 +85,40 @@ class ProductWebController extends Controller
             return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->route('products.index')->withInput()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function viewCreate()
+    {
+        try {
+            return view('products.viewCreate');
+        } catch (\Exception $e) {
+            return redirect()->route('products.index')->withInput()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function create(Request $request)
+    {
+        try {
+            $params = $request->validate([
+                'name' => 'required|string',
+                'price' => 'required|numeric',
+                'amount' => 'required|integer',
+            ]);
+
+            $data = new ProductData(
+                ProductData::generateUuid(),
+                $params['name'],
+                ProductStatusEnum::ACTIVE->value,
+                $params['price'],
+                $params['amount']
+            );
+
+            $product = $this->service->create($data);
+
+            return redirect()->route('products.show', $product->id)->with('success', 'Product created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('products.viewCreate')->withInput()->withErrors([$e->getMessage()]);
         }
     }
 }
