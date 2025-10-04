@@ -28,6 +28,20 @@
                         </div>
                     @endif
 
+                    {{-- BOTÃO CRIAR NOVO PRODUTO --}}
+                    <div class="flex justify-start mb-4">
+                        <a href="{{ route('products.viewCreate') }}"
+                        class="inline-flex items-center px-5 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md 
+                                hover:bg-green-700 hover:shadow-lg transition duration-300 transform hover:-translate-y-1 
+                                dark:bg-green-500 dark:hover:bg-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Create New Product
+                        </a>
+                    </div>
+
                     {{-- FILTROS --}}
                     <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <form method="GET" class="flex flex-wrap gap-2 sm:gap-4 w-full">

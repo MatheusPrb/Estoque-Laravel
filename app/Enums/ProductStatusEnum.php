@@ -22,6 +22,8 @@ enum ProductStatusEnum: string
         return match ($status) {
             '1' => self::ACTIVE->value,
             '0' => self::INACTIVE->value,
+            self::ACTIVE->value => self::ACTIVE->value,
+            self::INACTIVE->value => self::INACTIVE->value,
             default => '',
         };
     }
