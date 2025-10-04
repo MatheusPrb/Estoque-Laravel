@@ -100,18 +100,12 @@ class ProductWebController extends Controller
     public function create(Request $request)
     {
         try {
-            $params = $request->validate([
-                'name' => 'required|string',
-                'price' => 'required|numeric',
-                'amount' => 'required|integer',
-            ]);
-
             $data = new ProductData(
                 ProductData::generateUuid(),
-                $params['name'],
+                $request->name,
                 ProductStatusEnum::ACTIVE->value,
-                $params['price'],
-                $params['amount']
+                $request->price,
+                $request->amount
             );
 
             $product = $this->service->create($data);
