@@ -9,6 +9,15 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                {{-- MENSAGENS DE SUCESSO --}}
+                    @if(session('success'))
+                        <div class="mb-4 text-sm text-green-500 dark:text-green-400">
+                            @foreach((array) session('success') as $message)
+                                <p>{{ $message }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+
                     <h3 class="text-lg font-semibold mb-4">{{ $product->name }}</h3>
 
                     <div class="mb-2">
